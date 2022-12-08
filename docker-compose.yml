@@ -2,8 +2,7 @@ version: '3'
 
 services:
   app:
-    build:
-      context: .
+    build: docker/node
     container_name: chakra-todo
     tty: true
     stdin_open: true
@@ -11,3 +10,19 @@ services:
       - .:/chakra-todo
     ports:
       - '3000:3000'
+      - '5555:5555' # npx prisma studio
+
+  db:
+    build: docker/mysql
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --init-connect='SET NAMES UTF8; SET CHARACTER SET utf8mb4;'
+    container_name: chakra-todo_db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: chakra_todo_db # sqlで初回起動時に作成されるデータベース名
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - '3307:3306'
+
+volumes:
+  db_data:
